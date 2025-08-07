@@ -17,14 +17,16 @@ The project provides both pure MATLAB and high-performance MEX (C) implementatio
 
 ## File Overview
 
-| File/Folder               | Description                                                                                 |
-|---------------------------|---------------------------------------------------------------------------------------------|
-| `tswHist.m`               | Main MATLAB function for sliding window histograms (multiple algorithm variants)            |
-| `tswHist_mx.c`            | Twin MEX function for tswHist.m                                                             |
-| `tswHist_mx.h`            | C header with core routines for `tswHist_mx.c` and `hist_int_mx.c`                          |
-| `hist_int_mx.c`           | Twin MEX function for local hist_int matlab function (used by `tswHist.m` custom-mx variant)|
-| `Makefile`                | Build script for compiling all MEX files                                                    |
-| `test/test_tswHist.m`     | Test script for validating correctness and benchmarking all implementations                 |
+| File/Folder               | Description                                                                                   |
+|---------------------------|---------------------------------------------------------------------------------------------  |
+| `tswHist.m`               | Main MATLAB function for sliding window histograms (multiple algorithm variants)              |
+| `tswHist_mx.c`            | Twin MEX function for `tswHist.m`                                                             |
+| `tswHist_mx.h`            | C header with core routines for `tswHist_mx.c` and `hist_int_mx.c`                            |
+| `tswHist_mx_c.c`          | Twin MEX function for `tswHist.m` using an alternative pure C implementation                  |
+| `tswHist.h`               | Pure C alternative of `tswHist_mx.h` for `tswHist_mx_c.c`                                     |
+| `hist_int_mx.c`           | Twin MEX function for local hist_int matlab function (used by `tswHist.m` custom-mx variant)  |
+| `Makefile`                | Build script for compiling all MEX files                                                      |
+| `test/test_tswHist.m`     | Test script for validating correctness and benchmarking all implementations                   |
 
 ---
 
@@ -67,6 +69,12 @@ For maximum speed, use the MEX implementation directly:
 [histMat, loci, edges] = tswHist_mx(x, n_bins, win_len, stride)
 ```
 
+or the pure C implementation:
+
+```matlab
+[histMat, loci, edges] = tswHist_mx_c(x, n_bins, win_len, stride)
+```
+
 ## Testing
 Run the test script to validate functionality and performance:
 
@@ -78,11 +86,12 @@ On my computer, I get the following results:
 
 | Implementation                                                               | Execution time (s) |
 |------------------------------------------------------------------------------|--------------------|
-| Exhaustive computation for each window                                       | 0.4423             |
-| `tswHist` using builtin `histcounts` for 1st window histogram                | 0.0158             |
-| `tswHist` using personal MATLAB histogram for 1st window histogram             | 0.0172             |
-| `tswHist` using personal MEX histogram for 1st window histogram                | 0.0166             |
-| `tswHist_mx` (C MEX twin of `tswHist.m`)                                     | 0.0055             |
+| Exhaustive computation for each window                                       | 0.3802             |
+| `tswHist` using builtin `histcounts` for 1st window histogram                | 0.0150             |
+| `tswHist` using personal MATLAB histogram for 1st window histogram           | 0.0146             |
+| `tswHist` using personal MEX histogram for 1st window histogram              | 0.0139             |
+| `tswHist_mx` (C MEX twin of `tswHist.m`)                                     | 0.0035             |
+| `tswHist_mx_c` (C MEX twin of `tswHist.m` using pure C core routines)        | 0.0022             |
 
 *Note: Lower execution time is (obviously) better.
 
