@@ -8,11 +8,11 @@
 % Example:
 %   run test_tswHist
 %
-% Other m-files required: tswHist.m, tswHist_mx (MEX), hist_int_mx (MEX)
+% Other m-files required: tswHist.m, tswHist_mx (MEX), hist_int_mx (MEX), tswHist_mx_c (MEX)
 % Subfunctions: none
 % MAT-files required: none
 %
-% See also: tswHist.m, tswHist_mx.c, tswHist_mx.h, hist_int_mx.c, histcounts
+% See also: tswHist.m, tswHist_mx.c, tswHist_mx.h, hist_int_mx.c, tswHist_mx_c.c, histcounts
 %
 % Project: tswHist (https://github.com/cyber-g/tswHist)
 %
@@ -55,6 +55,9 @@ timeit(@() tswHist(x, n_bins, win_len, stride,'custom-mx'))
 [histMat_fullmx, windows_loci_fullmx, edges_fullmx] = tswHist_mx(x, n_bins, win_len, stride);
 timeit(@() tswHist_mx(x, n_bins, win_len, stride))
 
+[histMat_mx_c, windows_loci_mx_c, edges_mx_c] = tswHist_mx_c(x, n_bins, win_len, stride);
+timeit(@() tswHist_mx_c(x, n_bins, win_len, stride))
+
 histMat_ref = zeros(n_bins, floor((length(x) - win_len + 1) / stride));
 
 % Exhaustive computation for each window
@@ -70,15 +73,18 @@ assert(isequal(histMat_bt, histMat_ref), 'Sliding window histograms do not match
 assert(isequal(histMat_custml, histMat_ref), 'Custom ML sliding window histograms do not match exhaustive computation.');
 assert(isequal(histMat_custmx, histMat_ref), 'Custom MX sliding window histograms do not match exhaustive computation.');
 assert(isequal(histMat_fullmx, histMat_ref), 'Full MX sliding window histograms do not match exhaustive computation.');
+assert(isequal(histMat_mx_c, histMat_ref), 'MEX C sliding window histograms do not match exhaustive computation.');
 
 assert(isequal(windows_loci_bt, windows_loci_custml), 'Window loci do not match between built-in and custom ML.');
 assert(isequal(windows_loci_bt, windows_loci_custmx), 'Window loci do not match between built-in and custom MX.');
 assert(isequal(windows_loci_bt, windows_loci_fullmx), 'Window loci do not match between built-in and full MX.');
+assert(isequal(windows_loci_bt, windows_loci_mx_c), 'Window loci do not match between built-in and MEX C.');
 
 assert(isequal(edges_bt,histcounts_edges), 'Edges do not match between built-in and exhaustive computation.');
 assert(isequal(edges_custml, histcounts_edges), 'Edges do not match between custom ML and exhaustive computation.');
 assert(isequal(edges_custmx, histcounts_edges), 'Edges do not match between custom MX and exhaustive computation.');
 assert(isequal(edges_fullmx, histcounts_edges), 'Edges do not match between full MX and exhaustive computation.');
+assert(isequal(edges_mx_c, histcounts_edges), 'Edges do not match between MEX C and exhaustive computation.');
 
 disp(['All tests in '  mfilename() ' passed successfully!']);
 %------------- END OF CODE --------------
