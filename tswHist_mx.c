@@ -35,7 +35,11 @@
 
 #include "mex.h"
 #include <math.h>
-#include "tswHist_mx.h"
+# if __has_include("tswHist_mx.h")   /* try the MATLAB-enabled version first */
+#   include "tswHist_mx.h"
+# else                               /* otherwise use pure C version (equally the same) */
+#   include "tswHist.h"
+# endif
 
 
 void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
