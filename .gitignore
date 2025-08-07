@@ -1,3 +1,11 @@
+# VS Code settings
+.vscode
+
+template_header.m
+
+# Mex files
+*.mexa64
+
 # Prerequisites
 *.d
 
