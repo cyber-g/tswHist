@@ -9,7 +9,7 @@ The project provides both pure MATLAB and high-performance MEX (C) implementatio
 ## Features
 
 - Efficient sliding window histogram computation for large 1D signals
-- Differential update algorithm for speed using [S. Perreault and P. Hebert, "Median Filtering in Constant Time,"](https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=4287006&isnumber=4286981)
+- Differential update algorithm for speed using [S. Perreault and P. Hebert, "Median Filtering in Constant Time,"](https://doi.org/10.1109/TIP.2007.902329)
 - Multiple variants: pure MATLAB, custom MATLAB, and MEX (C) backends
 - Test and benchmarking
 
@@ -96,4 +96,4 @@ This project is licensed under the [GNU General Public License v3.0](LICENSE).
 ## References
 
 - [FastHist: https://github.com/cyber-g/FastHist](https://github.com/cyber-g/FastHist)
-- [Median Filtering in Constant Time, Perreault & Hebert, IEEE TIP 2007](https://ieeexplore.ieee.org/document/4287006)
+- [Median Filtering in Constant Time, Perreault & Hebert, IEEE TIP 2007](https://doi.org/10.1109/TIP.2007.902329)
