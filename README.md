@@ -1,10 +1,8 @@
 # tswHist
 
 **tswHist** (pronounced "tswist" like "twist", but with an additional 's') stands for **Turbo Sliding Window Histograms**.  
-It is a lightweight MATLAB + C library for fast, efficient computation of sliding-window histograms on 1D signals.  
-The project provides both pure MATLAB and high-performance MEX (C) implementations.
 
----
+It is a lightweight MATLAB + C library for fast, efficient computation of sliding-window histograms on 1D signals. The project provides both pure MATLAB and high-performance MEX (C) implementations.
 
 ## Features
 
@@ -12,8 +10,6 @@ The project provides both pure MATLAB and high-performance MEX (C) implementatio
 - Differential update algorithm for speed using [S. Perreault and P. Hebert, "Median Filtering in Constant Time,"](https://doi.org/10.1109/TIP.2007.902329)
 - Multiple variants: pure MATLAB, custom MATLAB, and MEX (C) backends
 - Test and benchmarking
-
----
 
 ## File Overview
 
@@ -27,8 +23,6 @@ The project provides both pure MATLAB and high-performance MEX (C) implementatio
 | `hist_int_mx.c`           | Twin MEX function for local hist_int matlab function (used by `tswHist.m` custom-mx variant)  |
 | `Makefile`                | Build script for compiling all MEX files                                                      |
 | `test/test_tswHist.m`     | Test script for validating correctness and benchmarking all implementations                   |
-
----
 
 ## Requirements
 
@@ -99,8 +93,6 @@ On my computer, I get the following results:
 ## License
 
 This project is licensed under the [GNU General Public License v3.0](LICENSE).
-
----
 
 ## References
 
