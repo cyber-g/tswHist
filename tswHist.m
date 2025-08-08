@@ -98,6 +98,10 @@ function [histMat,strided_windows_loci,edges] = tswHist(input, n_bins, win_len, 
         case 'custom-mx'
             % Use a personal open source implementation of histogram
             bufferHist = hist_int_mx(input_int(1:win_len), n_bins);
+        case 'pushHist'
+            % Patch the input vector to match histcounts behavior
+            input_int(input_int==n_bins) = n_bins-1; 
+            bufferHist = pushHist(zeros(1,n_bins),input_int(1:win_len));
         otherwise
             error('Unknown variant specified. Use "builtin", "custom-ml", or "custom-mx".');
     end
