@@ -29,7 +29,7 @@
 void pushHist(double *hist_vec, const double *input_int, size_t len, size_t n_bins) {
     for (size_t i = 0; i < len; ++i) {
         int bin = (int)input_int[i];
-        if (bin >= 0 && bin < (int)n_bins) {
+        if (bin >= 0 && bin < n_bins) {
             hist_vec[bin] += 1;
         }
     }
