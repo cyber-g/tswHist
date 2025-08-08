@@ -101,7 +101,7 @@ void tswHist(
         edges[i] = min_val + (max_val - min_val) * ((double)i / n_bins);
 
     // Normalize input to integer bins
-    double *input_int = (double *)malloc(input_len * sizeof(double));
+    double *input_int = (double *)calloc(input_len, sizeof(double));
     for (size_t i = 0; i < input_len; ++i) {
         double norm = (input[i] - min_val) / (max_val - min_val);
         int bin = (int)floor(norm * n_bins);
@@ -116,7 +116,7 @@ void tswHist(
         histMat[b] = bufferHist[b];
 
     // Prepare offsets for pop/push
-    double *offsets = (double *)malloc(stride * sizeof(double));
+    double *offsets = (double *)calloc(stride, sizeof(double));
     for (size_t i = 0; i < stride; ++i)
         offsets[i] = -(double)(stride - 1 - i);
 
