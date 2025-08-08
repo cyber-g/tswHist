@@ -1,6 +1,6 @@
-function [histMat,strided_windows_loci,edges] = tswHist(input, n_bins, win_len, stride, variant)
+function [histMat,strided_windows_loci,edges] = tswHist(input_norm, n_bins, win_len, stride, variant)
 % TSWHIST - Fast sliding window histogram computation for 1D signals.
-%   [histMat, strided_windows_loci, edges] = tswHist(input, n_bins, win_len, stride, variant)
+%   [histMat, strided_windows_loci, edges] = tswHist(input_norm, n_bins, win_len, stride, variant)
 %
 %   Computes histograms over sliding windows using efficient differential
 %   updates. The local hist_int matlab function is adapted from the core of the
@@ -11,11 +11,11 @@ function [histMat,strided_windows_loci,edges] = tswHist(input, n_bins, win_len, 
 %   Use tswHist_mx for a faster implementation of this function using MEX.
 %
 %   Inputs:
-%     input    - Input vector (1D signal)
-%     n_bins   - Number of histogram bins (integer > 2)
-%     win_len  - Sliding window length
-%     stride   - Stride for sliding window (default: 1)
-%     variant  - 'builtin', 'custom-ml', or 'custom-mx' (default: 'builtin')
+%     input_norm - Normalized input vector (1D signal) (in [0,1])
+%     n_bins     - Number of histogram bins (integer > 2)
+%     win_len    - Sliding window length
+%     stride     - Stride for sliding window (default: 1)
+%     variant    - 'builtin', 'custom-ml', or 'custom-mx' (default: 'builtin')
 %
 %   Outputs:
 %     histMat              - n_bins x num_windows matrix of histograms
@@ -55,7 +55,7 @@ function [histMat,strided_windows_loci,edges] = tswHist(input, n_bins, win_len, 
     if nargin < 5
         variant = 'builtin';
     end
-    if ~isvector(input)
+    if ~isvector(input_norm)
         error('Input must be a vector.');
     end
     % n_bins must be a positive integer larger than 2
@@ -73,7 +73,7 @@ function [histMat,strided_windows_loci,edges] = tswHist(input, n_bins, win_len, 
     end
 
     % Compute the strided windows loci
-    strided_windows_loci = 1:stride:(length(input) - win_len + 1);
+    strided_windows_loci = 1:stride:(length(input_norm) - win_len + 1);
 
     % Compute the number of strided windows
     num_strided_windows  = floor(length(strided_windows_loci));
@@ -81,10 +81,9 @@ function [histMat,strided_windows_loci,edges] = tswHist(input, n_bins, win_len, 
     % Initialize the histogram matrix
     histMat              = zeros(n_bins, num_strided_windows);
 
-    % Normalize the input vector to the number of bins for efficient integer based histogram calculation
-    min_val = min(input);
-    max_val = max(input);
-    input_norm = (input - min_val) / (max_val - min_val);
+    % The normalization is left outside this function for more flexibility The
+    % input vector is expected to be included in [0,1] (not necessarily exactly
+    % occupying this range)
     input_int  = floor(input_norm * n_bins); 
 
     % Compute the histogram for the first window
@@ -94,9 +93,13 @@ function [histMat,strided_windows_loci,edges] = tswHist(input, n_bins, win_len, 
             bufferHist = histcounts(input_int(1:win_len), 0:n_bins);
         case 'custom-ml'
             % Use a personal open source implementation of histogram
+            % Patch the input vector to match histcounts behavior
+            input_int(input_int==n_bins) = n_bins-1; 
             bufferHist = hist_int(input_int(1:win_len), n_bins);
         case 'custom-mx'
             % Use a personal open source implementation of histogram
+            % Patch the input vector to match histcounts behavior
+            input_int(input_int==n_bins) = n_bins-1; 
             bufferHist = hist_int_mx(input_int(1:win_len), n_bins);
         case 'pushHist'
             % Patch the input vector to match histcounts behavior
@@ -131,8 +134,9 @@ function [histMat,strided_windows_loci,edges] = tswHist(input, n_bins, win_len, 
         histMat(:, i) = bufferHist;
 
     end
-    % Compute the edges for the histogram bins
-    edges = (0:n_bins)/n_bins * (max_val - min_val)  + min_val;
+    % Compute the edges for the histogram bins. Bin edges are set to be between
+    % 0 and 1 exactly here, 0 and 1 are included in the edges
+    edges = (0:n_bins)/n_bins;
 
 end
 
