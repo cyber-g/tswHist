@@ -58,9 +58,9 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         mexErrMsgIdAndTxt("tswHist_mx:inputNotReal", "Input must be a real double vector.");
     mwSize input_len    = mxGetNumberOfElements(input_mx);
     #if MX_HAS_INTERLEAVED_COMPLEX
-        mxDouble *input = mxGetDoubles(input_mx);
+        mxDouble *input_norm = mxGetDoubles(input_mx);
     #else
-        double *input   = mxGetPr(input_mx);
+        double *input_norm   = mxGetPr(input_mx);
     #endif
 
     if (n_bins <= 2)
@@ -79,12 +79,8 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
     for (mwSize i = 0; i < num_windows; ++i)
         strided_windows_loci[i] = 1 + i * stride; // MATLAB 1-based
 
-    // Compute histogram bin edges
-    double min_val = input[0], max_val = input[0];
-    for (mwSize i = 1; i < input_len; ++i) {
-        if (input[i] < min_val) min_val = input[i];
-        if (input[i] > max_val) max_val = input[i];
-    }
+    // Compute the edges for the histogram bins. Bin edges are set to be between
+    // 0 and 1 exactly here, 0 and 1 are included in the edges
     plhs[2] = mxCreateDoubleMatrix(1, n_bins + 1, mxREAL);
     #if MX_HAS_INTERLEAVED_COMPLEX
         mxDouble *edges = mxGetDoubles(plhs[2]);
@@ -92,13 +88,15 @@ void mexFunction(int nlhs, mxArray *plhs[], int nrhs, const mxArray *prhs[]) {
         double *edges   = mxGetPr(plhs[2]);
     #endif
     for (mwSize i = 0; i <= n_bins; ++i)
-        edges[i] = min_val + (max_val - min_val) * ((double)i / n_bins);
+        edges[i] = ((double)i / n_bins);
 
     // Normalize input to integer bins
     double *input_int = (double *)mxMalloc(input_len * sizeof(double));
     for (mwSize i = 0; i < input_len; ++i) {
-        double norm = (input[i] - min_val) / (max_val - min_val);
-        int bin     = (int)floor(norm * n_bins);
+        //  The normalization is left outside this function for more flexibility
+        //  The input vector is expected to be included in [0,1] (not
+        //  necessarily exactly occupying this range)
+        int bin     = (int)floor(input_norm[i] * n_bins);
         if (bin == (int)n_bins) bin = n_bins - 1; // Patch for max value
         input_int[i] = (double)bin;
     }
