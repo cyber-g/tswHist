@@ -75,7 +75,9 @@ histMat_ref = zeros(n_bins, floor((length(x) - win_len + 1) / stride));
 
 % Exhaustive computation for each window
 tic
-histcounts_edges = (0:n_bins) / n_bins * (max(x) - min(x)) + min(x);
+% Compute the edges for the histogram bins. Bin edges are set to be between
+% 0 and 1 exactly here, 0 and 1 are included in the edges
+histcounts_edges = (0:n_bins) / n_bins;
 for i = 1:length(windows_loci_bt)
     idx = windows_loci_bt(i):(windows_loci_bt(i)+win_len-1);
     histMat_ref(:, i) = histcounts(x(idx), histcounts_edges);
