@@ -34,14 +34,27 @@ if ~exist('tswHist_mx.mexa64', 'file') || ~exist('hist_int_mx.mexa64', 'file')
     end
 end
 
-
+test = 'gaussian'; % Choose 'gaussian' or 'uniform' for the type of input vector to test
 
 % Test for tswHist function
 n_bins  = 100;  % Number of histogram bins
 win_len = 5000; % Length of the sliding window
 stride  = 10;  % Stride for the sliding window
 
-x = randn(1, 100000); % Long Gaussian random vector
+switch test
+    case 'gaussian'
+        % Generate a long Gaussian random vector normalized to [0, 1]
+        x = randn(1, 100000); % Long Gaussian random vector
+        x = (x - min(x)) / (max(x) - min(x)); % Normalize to [0, 1]
+        % then the data exactly contains at least one 0 and one 1
+    case 'uniform'
+        % Generate a long uniform random vector normalized to [0, 1]
+        x = rand(1, 100000); % Long uniform random vector
+        % 0 and 1 are not necessarily in the samples
+    otherwise
+        error('Unknown test type. Use "gaussian" or "uniform".');
+end
+
 
 [histMat_bt, windows_loci_bt, edges_bt] = tswHist(x, n_bins, win_len, stride);
 timeit(@() tswHist(x, n_bins, win_len, stride))
